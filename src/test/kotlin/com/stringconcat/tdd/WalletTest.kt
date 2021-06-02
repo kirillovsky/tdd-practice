@@ -26,6 +26,13 @@ internal class WalletTest {
     }
 
     @Test
+    fun `wallet containing 2 USD, 3 EUR and 4 CHF is another wallet containing 3 EUR, 2 USD and 4 CHF`() {
+        val actualWallet = Wallet(dollar(2.0), euro(3.0), franc(4.0))
+
+        actualWallet shouldBe Wallet(euro(3.0), dollar(2.0), franc(4.0))
+    }
+
+    @Test
     fun `wallet that contains 2 USD returns 2 dollars regardless rate`() {
         Wallet(dollar(2.0)).toMoney(CurrencyExchanger(), USD) shouldBe dollar(2.0)
     }
@@ -109,5 +116,33 @@ internal class WalletTest {
         val actualMoney = Wallet(dollar(4.0), franc(2.0)).toMoney(exchanger, targetCurrency = EUR)
 
         actualMoney shouldBe euro(2.5)
+    }
+
+    @Test
+    fun `wallet that contains 30 USD plus 30 CHF should be wallet that contains 30 USD and 30 CHF`() {
+        val actualWallet = Wallet(dollar(30.0)) + franc(30.0)
+
+        actualWallet shouldBe Wallet(dollar(30.0), franc(30.0))
+    }
+
+    @Test
+    fun `wallet that contains 30 USD and 30 CHF plus 30 USD should be wallet that contains 60 USD and 30 CHF`() {
+        val actualWallet = Wallet(dollar(30.0), franc(30.0)) + dollar(30.0)
+
+        actualWallet shouldBe Wallet(dollar(60.0), franc(30.0))
+    }
+
+    @Test
+    fun `3 EUR plus wallet with 2 USD should be wallet with 3 EUR and 2 USD`() {
+        val actualWallet = euro(3.0) + Wallet(dollar(2.0))
+
+        actualWallet shouldBe Wallet(dollar(2.0), euro(3.0))
+    }
+
+    @Test
+    fun `wallet should be added with another wallet by merge it's moneys`() {
+        val actualWallet = Wallet(dollar(30.0), franc(20.0)) + Wallet(franc(20.0), euro(30.0))
+
+        actualWallet shouldBe Wallet(dollar(30.0), euro(30.0), franc(40.0))
     }
 }

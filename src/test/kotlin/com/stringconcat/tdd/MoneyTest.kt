@@ -89,4 +89,9 @@ internal class MoneyTest {
     fun `3,2 euro is 3,3 euro`() {
         euro(3.2) shouldBe euro(3.2)
     }
+
+    @Test
+    fun `same money should have some hashCodes`() {
+        dollar(3.0).hashCode() shouldBe dollar(3.0).hashCode()
+    }
 }

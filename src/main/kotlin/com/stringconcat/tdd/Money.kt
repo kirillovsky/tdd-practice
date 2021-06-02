@@ -4,7 +4,7 @@ import com.stringconcat.tdd.Money.Currency.CHF
 import com.stringconcat.tdd.Money.Currency.EUR
 import com.stringconcat.tdd.Money.Currency.USD
 
-open class Money(
+data class Money(
     val amount: Double,
     val currency: Currency,
 ) {
@@ -32,16 +32,7 @@ open class Money(
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (other !is Money) return false
-        return this.amount == other.amount && this.currency == other.currency
-    }
-
     operator fun times(multiplier: Int): Money {
         return Money(amount * multiplier, currency)
-    }
-
-    override fun toString(): String {
-        return "Money(amount=$amount, currency=$currency)"
     }
 }
