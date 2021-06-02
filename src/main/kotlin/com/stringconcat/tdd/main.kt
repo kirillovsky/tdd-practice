@@ -3,7 +3,7 @@ fun main() {
 }
 
 // to big amount (more than double)
-// Money should multiply to double withround to 4 decimal places
+// Money should multiply to double with round to 4 decimal places
 
 // CurrencyExchanger. what if pass two rates with same currencyPairs
 // CurrencyExchanger. reversed rate

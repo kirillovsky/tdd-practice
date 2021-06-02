@@ -12,42 +12,42 @@ import org.junit.jupiter.api.Test
 internal class MoneyTest {
 
     @Test
-    fun `5 dollars is 5 dollars`() {
+    fun `5 USD is 5 USD`() {
         dollar(5.0) shouldBe dollar(5.0)
     }
 
     @Test
-    fun `5 dollars is NOT 2 dollars`() {
+    fun `5 USD is NOT 2 USD`() {
         dollar(5.0) shouldNotBe dollar(2.0)
     }
 
     @Test
-    fun `5 dollars * 2 is 10 dollars`() {
+    fun `5 USD * 2 is 10 USD`() {
         dollar(5.0) * 2 shouldBe dollar(10.0)
     }
 
     @Test
-    fun `5 dollars * 3 is 15 dollars`() {
+    fun `5 USD * 3 is 15 USD`() {
         dollar(5.0) * 3 shouldBe dollar(15.0)
     }
 
     @Test
-    fun `5 franc is 5 franc`() {
+    fun `5 CHF is 5 CHF`() {
         franc(5.0) shouldBe franc(5.0)
     }
 
     @Test
-    fun `5 franc is NOT 2 franc`() {
+    fun `5 CHF is NOT 2 CHF`() {
         franc(5.0) shouldNotBe franc(2.0)
     }
 
     @Test
-    fun `5 franc * 2 is 10 franc`() {
+    fun `5 CHF * 2 is 10 CHF`() {
         franc(5.0) * 2 shouldBe franc(10.0)
     }
 
     @Test
-    fun `5 franc * 3 is 15 franc`() {
+    fun `5 CHF * 3 is 15 CHF`() {
         franc(5.0) * 3 shouldBe franc(15.0)
     }
 
@@ -57,12 +57,12 @@ internal class MoneyTest {
     }
 
     @Test
-    fun `5 dollar + 5 dollar is 10 dollars`() {
+    fun `5 USD + 5 USD is 10 USD`() {
         dollar(5.0) + dollar(5.0) shouldBe Wallet(dollar(10.0))
     }
 
     @Test
-    fun `5 dollars is not 5 francs`() {
+    fun `5 USD is not 5 CHF`() {
         dollar(5.0) shouldNotBe franc(5.0)
     }
 
@@ -72,7 +72,7 @@ internal class MoneyTest {
     }
 
     @Test
-    fun `4,2 dollars is 4,2 dollars`() {
+    fun `4,2 USD is 4,2 USD`() {
         dollar(4.2) shouldBe dollar(4.2)
     }
 
@@ -86,7 +86,7 @@ internal class MoneyTest {
     }
 
     @Test
-    fun `3,2 euro is 3,3 euro`() {
+    fun `3,2 EUR is 3,3 EUR`() {
         euro(3.2) shouldBe euro(3.2)
     }
 

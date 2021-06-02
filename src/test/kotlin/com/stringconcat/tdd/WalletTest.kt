@@ -21,7 +21,7 @@ internal class WalletTest {
     }
 
     @Test
-    fun `wallet containing 2 dollars is another wallet containing 2 dollars`() {
+    fun `wallet containing 2 USD is another wallet containing 2 USD`() {
         Wallet(dollar(2.0)) shouldBe Wallet(dollar(2.0))
     }
 
@@ -33,12 +33,12 @@ internal class WalletTest {
     }
 
     @Test
-    fun `wallet that contains 2 USD returns 2 dollars regardless rate`() {
+    fun `wallet that contains 2 USD returns 2 USD regardless rate`() {
         Wallet(dollar(2.0)).toMoney(CurrencyExchanger(), USD) shouldBe dollar(2.0)
     }
 
     @Test
-    fun `wallet that contains 2 CHF returns 1 dollars if rate CHF to USD = 2`() {
+    fun `wallet that contains 2 CHF returns 1 USD if rate CHF to USD = 2`() {
         val exchanger = CurrencyExchanger(CurrencyPair(CHF, USD) to 2.0)
 
         Wallet(franc(2.0)).toMoney(exchanger, USD) shouldBe dollar(4.0)
