@@ -1,8 +1,6 @@
 package com.stringconcat.tdd
 
 import com.stringconcat.tdd.Money.Currency
-import com.stringconcat.tdd.Money.Currency.CHF
-import com.stringconcat.tdd.Money.Currency.USD
 
 class Wallet(vararg val money: Money) {
     init {
@@ -28,5 +26,13 @@ class Wallet(vararg val money: Money) {
             if (it.currency != targetCurrency) it.amount / rate
             else it.amount
         }.reduce(Double::plus)
+    }
+
+    fun toMoney(exchanger: CurrencyExchanger, targetCurrency: Currency): Money {
+        val amount = money.map {
+            exchanger.exchange(it.amount, from = it.currency, to = targetCurrency)
+        }.reduce(Double::plus)
+
+        return Money(amount, targetCurrency)
     }
 }

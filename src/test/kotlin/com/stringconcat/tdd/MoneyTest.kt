@@ -1,6 +1,7 @@
 package com.stringconcat.tdd
 
 import com.stringconcat.tdd.Money.Companion.dollar
+import com.stringconcat.tdd.Money.Companion.euro
 import com.stringconcat.tdd.Money.Companion.franc
 import com.stringconcat.tdd.Money.Currency.USD
 import io.kotest.assertions.throwables.shouldThrow
@@ -82,5 +83,10 @@ internal class MoneyTest {
         }
 
         exception.message shouldBe "Couldn't create money with negative amount"
+    }
+
+    @Test
+    fun `3,2 euro is 3,3 euro`() {
+        euro(3.2) shouldBe euro(3.2)
     }
 }
