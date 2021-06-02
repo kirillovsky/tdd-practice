@@ -5,7 +5,6 @@ import com.stringconcat.tdd.Money.Companion.franc
 import com.stringconcat.tdd.Money.Currency
 import com.stringconcat.tdd.Money.Currency.CHF
 import com.stringconcat.tdd.Money.Currency.USD
-import kotlin.math.roundToInt
 
 class Wallet(vararg val money: Money) {
     init {
@@ -29,10 +28,10 @@ class Wallet(vararg val money: Money) {
     fun asFranc(rate: Double): Money =
         franc(amount = amountInTargetCurrency(rate, CHF))
 
-    private fun amountInTargetCurrency(rate: Double, targetCurrency: Currency): Int {
+    private fun amountInTargetCurrency(rate: Double, targetCurrency: Currency): Double {
         return money.map {
-            if (it.currency != targetCurrency) (it.amount / rate).roundToInt()
+            if (it.currency != targetCurrency) it.amount / rate
             else it.amount
-        }.reduce(Int::plus)
+        }.reduce(Double::plus)
     }
 }

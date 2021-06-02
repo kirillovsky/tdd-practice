@@ -1,15 +1,25 @@
 package com.stringconcat.tdd
 
-open class Money(
-    val amount: Int,
-    val currency: Currency
-) {
+import com.stringconcat.tdd.Money.Currency.CHF
+import com.stringconcat.tdd.Money.Currency.USD
 
-    private val rate: Int = 2
+open class Money(
+    val amount: Double,
+    val currency: Currency,
+) {
+    enum class Currency {
+        USD, CHF
+    }
 
     companion object {
-        fun dollar(amount: Int) = Money(amount, Currency.USD)
-        fun franc(amount: Int) = Money(amount, Currency.CHF)
+        fun dollar(amount: Double) = Money(amount, USD)
+        fun franc(amount: Double) = Money(amount, CHF)
+    }
+
+    init {
+        require(amount >= 0) {
+            "Couldn't create money with negative amount"
+        }
     }
 
     operator fun plus(other: Money): Wallet {
@@ -31,9 +41,5 @@ open class Money(
 
     override fun toString(): String {
         return "Money(amount=$amount, currency=$currency)"
-    }
-
-    enum class Currency {
-        USD, CHF
     }
 }
