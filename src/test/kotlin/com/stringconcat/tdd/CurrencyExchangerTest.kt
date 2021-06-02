@@ -17,14 +17,14 @@ internal class CurrencyExchangerTest {
     }
 
     @Test
-    fun `exchanger should convert 10 USD to 20 CHF if rate USD to CHF = 0,5`() {
-        val exchanger = CurrencyExchanger(CurrencyPair(USD, CHF) to 0.5)
-
-        exchanger.exchange(10.0, USD, CHF) shouldBe 20.0
+    fun `exchanger should return amount if from and to currencies are equals`() {
+        CurrencyExchanger().exchange(100500.0, USD, USD) shouldBe 100500.0
     }
 
     @Test
-    fun `exchanger should return amount if from and to currencies are equals`() {
-        CurrencyExchanger().exchange(100500.0, USD, USD) shouldBe 100500.0
+    fun `exchanger should convert 10 USD to 9 CHF if rate USD to CHF = 0,9`() {
+        val exchanger = CurrencyExchanger(CurrencyPair(USD, CHF) to 0.9)
+
+        exchanger.exchange(10.0, USD, CHF) shouldBe 9.0
     }
 }

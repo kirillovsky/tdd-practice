@@ -18,16 +18,6 @@ class Wallet(vararg val money: Money) {
         return "Wallet(money=${money.contentToString()})"
     }
 
-    fun toMoney(rate: Double, targetCurrency: Currency): Money =
-        Money(amount = amountInTargetCurrency(rate, targetCurrency), targetCurrency)
-
-    private fun amountInTargetCurrency(rate: Double, targetCurrency: Currency): Double {
-        return money.map {
-            if (it.currency != targetCurrency) it.amount / rate
-            else it.amount
-        }.reduce(Double::plus)
-    }
-
     fun toMoney(exchanger: CurrencyExchanger, targetCurrency: Currency): Money {
         val amount = money.map {
             exchanger.exchange(it.amount, from = it.currency, to = targetCurrency)

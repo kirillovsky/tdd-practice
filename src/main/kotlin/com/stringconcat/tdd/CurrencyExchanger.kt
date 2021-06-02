@@ -12,7 +12,7 @@ class CurrencyExchanger(vararg rates: Pair<CurrencyPair, Double>) {
             "Couldn't convert $amount $from to $to"
         }
 
-        return amount / rate
+        return amount * rate
     }
 
     private fun findRate(from: Currency, to: Currency): Double? {
