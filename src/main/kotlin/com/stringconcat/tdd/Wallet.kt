@@ -1,7 +1,5 @@
 package com.stringconcat.tdd
 
-import com.stringconcat.tdd.Money.Companion.dollar
-import com.stringconcat.tdd.Money.Companion.franc
 import com.stringconcat.tdd.Money.Currency
 import com.stringconcat.tdd.Money.Currency.CHF
 import com.stringconcat.tdd.Money.Currency.USD
@@ -22,11 +20,8 @@ class Wallet(vararg val money: Money) {
         return "Wallet(money=${money.contentToString()})"
     }
 
-    fun asDollars(rate: Double): Money =
-        dollar(amount = amountInTargetCurrency(rate, USD))
-
-    fun asFranc(rate: Double): Money =
-        franc(amount = amountInTargetCurrency(rate, CHF))
+    fun toMoney(rate: Double, targetCurrency: Currency): Money =
+        Money(amount = amountInTargetCurrency(rate, targetCurrency), targetCurrency)
 
     private fun amountInTargetCurrency(rate: Double, targetCurrency: Currency): Double {
         return money.map {
