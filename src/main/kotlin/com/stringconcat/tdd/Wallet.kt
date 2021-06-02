@@ -1,9 +1,18 @@
 package com.stringconcat.tdd
 
+import com.stringconcat.tdd.Money.Companion.dollar
+import com.stringconcat.tdd.Money.Companion.franc
+import com.stringconcat.tdd.Money.Currency
+import com.stringconcat.tdd.Money.Currency.CHF
+import com.stringconcat.tdd.Money.Currency.USD
 import kotlin.math.roundToInt
 
 class Wallet(vararg val money: Money) {
-
+    init {
+        require(money.isNotEmpty()) {
+            "Couldn't create wallet without money"
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is Wallet) return false
@@ -14,8 +23,16 @@ class Wallet(vararg val money: Money) {
         return "Wallet(money=${money.contentToString()})"
     }
 
-    fun asDollars(rate: Double): Money {
-        return Money.dollar((money.first().amount / rate).roundToInt())
-    }
+    fun asDollars(rate: Double): Money =
+        dollar(amount = amountInTargetCurrency(rate, USD))
 
+    fun asFranc(rate: Double): Money =
+        franc(amount = amountInTargetCurrency(rate, CHF))
+
+    private fun amountInTargetCurrency(rate: Double, targetCurrency: Currency): Int {
+        return money.map {
+            if (it.currency != targetCurrency) (it.amount / rate).roundToInt()
+            else it.amount
+        }.reduce(Int::plus)
+    }
 }
