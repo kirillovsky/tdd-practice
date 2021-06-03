@@ -1,21 +1,11 @@
 package com.stringconcat.tdd
 
-import com.stringconcat.tdd.Money.Currency.CHF
-import com.stringconcat.tdd.Money.Currency.EUR
-import com.stringconcat.tdd.Money.Currency.USD
-
 data class Money(
     val amount: Double,
     val currency: Currency,
 ) {
     enum class Currency {
         USD, CHF, EUR
-    }
-
-    companion object {
-        fun dollar(amount: Double) = Money(amount, USD)
-        fun franc(amount: Double) = Money(amount, CHF)
-        fun euro(amount: Double) = Money(amount, EUR)
     }
 
     init {
