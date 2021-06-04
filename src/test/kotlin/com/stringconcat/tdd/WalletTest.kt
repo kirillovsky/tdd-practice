@@ -1,11 +1,14 @@
 package com.stringconcat.tdd
 
+import com.stringconcat.tdd.Money.Currency
 import com.stringconcat.tdd.Money.Currency.CHF
 import com.stringconcat.tdd.Money.Currency.EUR
 import com.stringconcat.tdd.Money.Currency.USD
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
 internal class WalletTest {
     @Test
@@ -18,119 +21,95 @@ internal class WalletTest {
     }
 
     @Test
-    fun `wallet containing 2 USD is another wallet containing 2 USD`() {
+    fun `wallet should be equals to another wallet with same money`() {
         Wallet(Money(2.0, USD)) shouldBe Wallet(Money(2.0, USD))
     }
 
     @Test
-    fun `wallet containing 2 USD, 3 EUR and 4 CHF is another wallet containing 3 EUR, 2 USD and 4 CHF`() {
+    fun `wallet should be equals to another wallet by containing money regardless it's order`() {
         val actualWallet = Wallet(Money(2.0, USD), Money(3.0, EUR), Money(4.0, CHF))
 
         actualWallet shouldBe Wallet(Money(3.0, EUR), Money(2.0, USD), Money(4.0, CHF))
     }
 
-    @Test
-    fun `wallet that contains 2 USD returns 2 USD regardless rate`() {
-        Wallet(Money(2.0, USD)).toMoney(CurrencyExchanger(), USD) shouldBe Money(2.0, USD)
+    @ParameterizedTest(name = "wallet should convert {0} {1} to {1} regardless rate")
+    @CsvSource("2, CHF", "3, USD")
+    fun `wallet should convert own money to targetCurrency regardless rate`(amount: Double, targetCurrency: Currency) {
+        val actualConvertedMoney = Wallet(Money(amount, targetCurrency)).toMoney(CurrencyExchanger(), targetCurrency)
+
+        actualConvertedMoney shouldBe Money(amount, targetCurrency)
+    }
+
+    @ParameterizedTest(name = "wallet should convert own money ({0}, {1}) to another currency ({2}) using rate 1:{3}")
+    @CsvSource(
+        "2, USD, CHF, 2, 4",
+        "2, CHF, USD, 2, 4",
+    )
+    fun `wallet should convert own money to another currency using rate`(
+        convertedAmount: Double,
+        convertedCurrency: Currency,
+        targetCurrency: Currency,
+        rateValue: Double,
+        expectedAmount: Double
+    ) {
+        val exchanger = CurrencyExchanger(CurrencyPair(convertedCurrency, targetCurrency) to rateValue)
+        val originalMoney = Money(convertedAmount, convertedCurrency)
+        val actualMoney = Wallet(originalMoney).toMoney(exchanger, targetCurrency)
+
+        actualMoney shouldBe Money(expectedAmount, targetCurrency)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "2, USD, CHF, 2, 8",
+        "2, USD, EUR, 0.5, 5",
+        "4, CHF, USD, 2, 12",
+        "5, CHF, USD, 5, 29",
+    )
+    fun `wallet should convert own monies to another currency using rate if it needs`(
+        convertedAmount: Double,
+        convertedCurrency: Currency,
+        targetCurrency: Currency,
+        rateValue: Double,
+        resultAmount: Double
+    ) {
+        val exchanger = CurrencyExchanger(CurrencyPair(convertedCurrency, targetCurrency) to rateValue)
+        val convertedMoney = Money(convertedAmount, convertedCurrency)
+        val wallet = Wallet(convertedMoney, Money(4.0, targetCurrency))
+
+        val actualMoney = wallet.toMoney(exchanger, targetCurrency)
+
+        actualMoney shouldBe Money(resultAmount, targetCurrency)
     }
 
     @Test
-    fun `wallet that contains 2 CHF returns 1 USD if rate CHF to USD = 2`() {
-        val exchanger = CurrencyExchanger(CurrencyPair(CHF, USD) to 2.0)
-
-        Wallet(Money(2.0, CHF)).toMoney(exchanger, USD) shouldBe Money(4.0, USD)
-    }
-
-    @Test
-    fun `wallet that contains 2 USD and 4 CHF should returns 4 USD if rate CHF to USD = 2`() {
-        val exchanger = CurrencyExchanger(CurrencyPair(CHF, USD) to 2.0)
-
-        Wallet(Money(2.0, USD), Money(4.0, CHF)).toMoney(exchanger, USD) shouldBe Money(10.0, USD)
-    }
-
-    @Test
-    fun `wallet that contains 2 USD and 5 CHF should returns 4 USD if rate CHF to USD = 5`() {
-        val exchanger = CurrencyExchanger(CurrencyPair(CHF, USD) to 5.0)
-
-        val actualMoney = Wallet(Money(2.0, USD), Money(5.0, CHF)).toMoney(exchanger, USD)
-
-        actualMoney shouldBe Money(27.0, USD)
-    }
-
-    @Test
-    fun `wallet that contains 2 CHF returns 1 CHF regardless rate`() {
-        val actualMoney = Wallet(Money(2.0, CHF)).toMoney(CurrencyExchanger(), CHF)
-
-        actualMoney shouldBe Money(2.0, CHF)
-    }
-
-    @Test
-    fun `wallet that contains 2 USD returns 1 CHF if rate USD to CHF = 2`() {
-        val exchanger = CurrencyExchanger(CurrencyPair(USD, CHF) to 2.0)
-
-        val actualMoney = Wallet(Money(2.0, USD)).toMoney(exchanger, CHF)
-
-        actualMoney shouldBe Money(4.0, CHF)
-    }
-
-    @Test
-    fun `wallet that contains 2 USD and 4 CHF should returns 5 CHF if rate USD to CHF = 0,5`() {
-        val exchanger = CurrencyExchanger(CurrencyPair(USD, CHF) to 0.5)
-
-        val actualMoney = Wallet(Money(2.0, USD), Money(4.0, CHF)).toMoney(exchanger, CHF)
-
-        actualMoney shouldBe Money(5.0, CHF)
-    }
-
-    @Test
-    fun `wallet that contains 2 USD and 4 CHF should returns 8 CHF if rate USD to CHF = 2`() {
-        val exchanger = CurrencyExchanger(CurrencyPair(USD, CHF) to 2.0)
-
-        val actualMoney = Wallet(Money(2.0, USD), Money(4.0, CHF)).toMoney(exchanger, targetCurrency = CHF)
-
-        actualMoney shouldBe Money(8.0, CHF)
-    }
-
-    @Test
-    fun `wallet that contains 2 EUR and 1 CHF should returns 8,5 USD if rates EUR to USD = 2 and CHF to USD = 0,5`() {
-        val exchanger = CurrencyExchanger(
-            CurrencyPair(EUR, USD) to 2.0,
-            CurrencyPair(CHF, USD) to 0.5
-        )
-
-        val actualMoney = Wallet(Money(2.0, EUR), Money(1.0, CHF)).toMoney(exchanger, targetCurrency = USD)
-
-        actualMoney shouldBe Money(4.5, USD)
-    }
-
-    @Test
-    fun `wallet that contains 4 USD and 2 CHF should returns 2,5 EUR if rates USD to EUR = 0,5 and CHF to EUR = 0,25`() {
+    fun `wallet should convert own monies to another currency using different rates`() {
         val exchanger = CurrencyExchanger(
             CurrencyPair(USD, EUR) to 0.5,
             CurrencyPair(CHF, EUR) to 0.25
         )
 
-        val actualMoney = Wallet(Money(4.0, USD), Money(2.0, CHF)).toMoney(exchanger, targetCurrency = EUR)
+        val actualMoney = Wallet(Money(4.0, USD), Money(2.0, CHF)).toMoney(exchanger, EUR)
 
         actualMoney shouldBe Money(2.5, EUR)
     }
 
     @Test
-    fun `wallet that contains 30 USD plus 30 CHF should be wallet that contains 30 USD and 30 CHF`() {
+    fun `wallet should be added with money with another currency`() {
         val actualWallet = Wallet(Money(30.0, USD)) + Money(30.0, CHF)
 
         actualWallet shouldBe Wallet(Money(30.0, USD), Money(30.0, CHF))
     }
 
     @Test
-    fun `wallet that contains 30 USD and 30 CHF plus 30 USD should be wallet that contains 60 USD and 30 CHF`() {
+    fun `wallet should be added with money with same currency`() {
         val actualWallet = Wallet(Money(30.0, USD), Money(30.0, CHF)) + Money(30.0, USD)
 
         actualWallet shouldBe Wallet(Money(60.0, USD), Money(30.0, CHF))
     }
 
     @Test
-    fun `3 EUR plus wallet with 2 USD should be wallet with 3 EUR and 2 USD`() {
+    fun `money should be added with wallet with another currency`() {
         val actualWallet = Money(3.0, EUR) + Wallet(Money(2.0, USD))
 
         actualWallet shouldBe Wallet(Money(2.0, USD), Money(3.0, EUR))

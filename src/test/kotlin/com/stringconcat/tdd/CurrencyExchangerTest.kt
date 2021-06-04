@@ -22,7 +22,7 @@ internal class CurrencyExchangerTest {
     }
 
     @Test
-    fun `exchanger should convert 10 USD to 9 CHF if rate USD to CHF = 0,9`() {
+    fun `exchanger should convert amount using rate`() {
         val exchanger = CurrencyExchanger(CurrencyPair(USD, CHF) to 0.9)
 
         exchanger.exchange(10.0, USD, CHF) shouldBe 9.0

@@ -1,78 +1,89 @@
 package com.stringconcat.tdd
 
+import com.stringconcat.tdd.Money.Currency
 import com.stringconcat.tdd.Money.Currency.CHF
 import com.stringconcat.tdd.Money.Currency.EUR
 import com.stringconcat.tdd.Money.Currency.USD
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import jdk.jfr.DataAmount
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.converter.ConvertWith
+import org.junit.jupiter.params.provider.CsvSource
 
 internal class MoneyTest {
-
-    @Test
-    fun `5 USD is 5 USD`() {
-        Money(5.0, USD) shouldBe Money(5.0, USD)
+    @ParameterizedTest(name = "{0} {1} is not {2} {3}")
+    @CsvSource(
+        "5, USD, 2, USD",
+        "5, CHF, 2, CHF",
+        "5, USD, 5, CHF"
+    )
+    fun `money should be different with another money by amount and currency`(
+        moneyAmount: Double,
+        moneyCurrency: Currency,
+        otherMoneyAmount: Double,
+        otherMoneyCurrency: Currency,
+    ) {
+        Money(moneyAmount, moneyCurrency) shouldNotBe Money(otherMoneyAmount, otherMoneyCurrency)
     }
 
-    @Test
-    fun `5 USD is NOT 2 USD`() {
-        Money(5.0, USD) shouldNotBe Money(2.0, USD)
+    @ParameterizedTest(name = "{0} {1} is {0} {1}")
+    @CsvSource("5, USD", "5, CHF", "4.2, USD", "3.2, EUR")
+    fun `money should be same with another money by amount and currency`(moneyAmount: Double, moneyCurrency: Currency) {
+        Money(moneyAmount, moneyCurrency) shouldBe Money(moneyAmount, moneyCurrency)
     }
 
-    @Test
-    fun `5 USD * 2 is 10 USD`() {
-        Money(5.0, USD) * 2 shouldBe Money(10.0, USD)
+    @ParameterizedTest(name = "{0} {1} * {2} is {3} {1}")
+    @CsvSource(
+        "5, USD, 2, 10",
+        "5, USD, 3, 15",
+        "5, CHF, 2, 10",
+        "5, CHF, 3, 15",
+        "5, EUR, 2, 10",
+        "5, EUR, 3, 15"
+    )
+    fun `money should be multiplied to int`(
+        originalAmount: Double,
+        currency: Currency,
+        multiplier: Int,
+        resultAmount: Double,
+    ) {
+        Money(originalAmount, currency) * multiplier shouldBe Money(resultAmount, currency)
     }
 
-    @Test
-    fun `5 USD * 3 is 15 USD`() {
-        Money(5.0, USD) * 3 shouldBe Money(15.0, USD)
+    @ParameterizedTest(name = "{0} {3} + {1} {3} is {2} {3}")
+    @CsvSource(
+        "5, 5, 10, USD",
+        "6, 3, 9, CHF",
+        "2, 9, 11, EUR",
+    )
+    fun `money should be added to another money with same currency`(
+        amount: Double,
+        otherAmount: Double,
+        resultAmount: Double,
+        currency: Currency,
+    ) {
+        Money(amount, currency) + Money(otherAmount, currency) shouldBe Wallet(Money(resultAmount, currency))
     }
 
-    @Test
-    fun `5 CHF is 5 CHF`() {
-        Money(5.0, CHF) shouldBe Money(5.0, CHF)
-    }
 
-    @Test
-    fun `5 CHF is NOT 2 CHF`() {
-        Money(5.0, CHF) shouldNotBe Money(2.0, CHF)
-    }
+    @ParameterizedTest(name = "money ({0}, {1}) should be added to another money ({2}, {3}) with another currency")
+    @CsvSource(
+        "2, CHF, 4, USD",
+        "3, CHF, 5, EUR",
+        "7, EUR, 9, USD"
+    )
+    fun `money should be added to another money with another currency`(
+        amount: Double,
+        currency: Currency,
+        anotherAmount: Double,
+        anotherCurrency: Currency,
+    ) {
+        val actualWallet = Money(amount, currency) + Money(anotherAmount, anotherCurrency)
 
-    @Test
-    fun `5 CHF * 2 is 10 CHF`() {
-        Money(5.0, CHF) * 2 shouldBe Money(10.0, CHF)
-    }
-
-    @Test
-    fun `5 CHF * 3 is 15 CHF`() {
-        Money(5.0, CHF) * 3 shouldBe Money(15.0, CHF)
-    }
-
-    @Test
-    fun `5 CHF + 5 CHF is 10 CHF`() {
-        Money(5.0, CHF) + Money(5.0, CHF) shouldBe Wallet(Money(10.0, CHF))
-    }
-
-    @Test
-    fun `5 USD + 5 USD is 10 USD`() {
-        Money(5.0, USD) + Money(5.0, USD) shouldBe Wallet(Money(10.0, USD))
-    }
-
-    @Test
-    fun `5 USD is not 5 CHF`() {
-        Money(5.0, USD) shouldNotBe Money(5.0, CHF)
-    }
-
-    @Test
-    fun `2 CHF + 4 USD is wallet that contains 2 CHF and 4 USD`() {
-        Money(2.0, CHF) + Money(4.0, USD) shouldBe Wallet(Money(2.0, CHF), Money(4.0, USD))
-    }
-
-    @Test
-    fun `4,2 USD is 4,2 USD`() {
-        Money(4.2, USD) shouldBe Money(4.2, USD)
+        actualWallet shouldBe Wallet(Money(amount, currency), Money(anotherAmount, anotherCurrency))
     }
 
     @Test
@@ -82,11 +93,6 @@ internal class MoneyTest {
         }
 
         exception.message shouldBe "Couldn't create money with negative amount"
-    }
-
-    @Test
-    fun `3,2 EUR is 3,3 EUR`() {
-        Money(3.2, EUR) shouldBe Money(3.2, EUR)
     }
 
     @Test
